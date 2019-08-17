@@ -1,5 +1,6 @@
 package co.com.ceiba.mobile.pruebadeingreso.di
 
+import co.com.ceiba.mobile.pruebadeingreso.rest.Endpoints.URL_BASE
 import okhttp3.OkHttpClient
 import org.koin.dsl.module
 import retrofit2.Retrofit
@@ -25,7 +26,7 @@ val networkModule = module {
 
     single {
         Retrofit.Builder()
-            .baseUrl("https://jsonplaceholder.typicode.com")
+            .baseUrl(URL_BASE)
             .addConverterFactory(MoshiConverterFactory.create(get()))
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .client(get())
