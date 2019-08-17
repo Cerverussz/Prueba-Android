@@ -1,22 +1,22 @@
 package co.com.ceiba.mobile.pruebadeingreso.data.remote.api
 
 import co.com.ceiba.mobile.pruebadeingreso.data.db.entities.InfoUser
-import co.com.ceiba.mobile.pruebadeingreso.entities.PostUser
+import co.com.ceiba.mobile.pruebadeingreso.entities.UserPosts
 import co.com.ceiba.mobile.pruebadeingreso.rest.Endpoints.GET_POST_USER
 import co.com.ceiba.mobile.pruebadeingreso.rest.Endpoints.GET_USERS
-import io.reactivex.Flowable
 import io.reactivex.Observable
+import io.reactivex.Single
 import retrofit2.http.GET
-import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface ApiService {
 
     @GET(GET_USERS)
-    fun getUsersList(): Observable<List<InfoUser>>
+    fun getUsersList(): Single<List<InfoUser>>
 
     @GET(GET_POST_USER)
-    fun getPosts(): Observable<List<PostUser>>
+    fun getPosts(): Observable<List<UserPosts>>
 
-    @GET("posts?userId={id}")
-    fun getUserPosts(@Path("id") id: Int): Observable<List<PostUser>>
+    @GET("posts")
+    fun getUserPosts(@Query("userId") id: Int): Single<List<UserPosts>>
 }

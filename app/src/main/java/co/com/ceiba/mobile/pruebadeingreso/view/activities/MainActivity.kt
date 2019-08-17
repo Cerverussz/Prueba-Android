@@ -11,6 +11,8 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import co.com.ceiba.mobile.pruebadeingreso.R
+import co.com.ceiba.mobile.pruebadeingreso.core.ConnectivityHelper
+import co.com.ceiba.mobile.pruebadeingreso.core.onChange
 import co.com.ceiba.mobile.pruebadeingreso.data.db.entities.InfoUser
 import co.com.ceiba.mobile.pruebadeingreso.data.remote.api.ApiService
 import co.com.ceiba.mobile.pruebadeingreso.view.adapters.UsersListAdapter
@@ -30,36 +32,22 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var usersListAdapter: UsersListAdapter
 
-    @SuppressLint("CheckResult")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val serviceAPI: ApiService = get()
-
         setContentView(R.layout.activity_main)
         setupUI()
-        setupHandlers()
 
-        serviceAPI.getUsersList()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread()).subscribeBy(
-                        onNext = { data ->
-                            usersLisTViewModel.insertUsersAPI(data)
-                            Log.i(TAG, "--- $data")
-                        },
-                        onError = {
-                            Log.i(TAG, it.message ?: "Error")
-                        },
-                        onComplete = {
-                            usersLisTViewModel.getUsersListDB()
-                        }
-                )
+        setupHandler()
+        checkNetwork()
     }
 
     private fun setupUI() {
-        usersListAdapter = UsersListAdapter {infoUser ->
+        usersListAdapter = UsersListAdapter { infoUser ->
             Intent(this@MainActivity, PostActivity::class.java).run {
-                putExtra("infoUser", infoUser)
+                putExtra("id", infoUser.id)
+                putExtra("name", infoUser.name)
+                putExtra("phone", infoUser.phone)
+                putExtra("email", infoUser.email)
                 startActivity(this)
             }
         }
@@ -69,17 +57,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupHandlers() {
-
-
+    private fun setupHandler() {
         usersLisTViewModel.getUsersListDBLiveData().observe(this, Observer { status ->
             when (status) {
                 is UIState.Loading -> {
-                    progressBar.visibility = VISIBLE
                     Log.i(TAG, "Loading...")
                 }
                 is UIState.Success<*> -> {
-                    progressBar.visibility = GONE
                     val data = status.data as MutableList<InfoUser>
                     if (data.count() != 0) {
                         usersListAdapter.setData(data)
@@ -92,6 +76,39 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         })
+    }
+
+    @SuppressLint("CheckResult")
+    private fun setupAPIService() {
+        val serviceAPI: ApiService = get()
+
+        serviceAPI.getUsersList()
+                .subscribeOn(Schedulers.io())
+                .doOnSubscribe { progressBar.visibility = VISIBLE }
+                .observeOn(AndroidSchedulers.mainThread()).subscribeBy(
+                        onSuccess = { data ->
+                            progressBar.visibility = GONE
+                            usersLisTViewModel.insertUsersAPI(data)
+                            usersLisTViewModel.getUsersListDB()
+                        },
+                        onError = {
+                            Log.i(TAG, it.message ?: "Error")
+                        }
+                )
+    }
+
+    private fun setupUsersSearch() {
+        editTextSearch.onChange {
+
+        }
+    }
+
+    private fun checkNetwork() {
+        if (ConnectivityHelper().isConnectedToNetwork(this@MainActivity)) {
+            setupAPIService()
+        } else {
+            usersLisTViewModel.getUsersListDB()
+        }
     }
 
     companion object {
