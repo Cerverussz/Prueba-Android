@@ -12,7 +12,7 @@ import retrofit2.http.Path
 interface ApiService {
 
     @GET(GET_USERS)
-    fun serachsUsers(): Observable<List<InfoUser>>
+    fun getUsersList(): Observable<List<InfoUser>>
 
     @GET(GET_POST_USER)
     fun getPosts(): Observable<List<PostUser>>

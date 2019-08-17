@@ -48,6 +48,8 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     kapt "com.github.bumptech.glide:compiler:$glide_version"
 
+    // Anko
+    implementation "org.jetbrains.anko:anko-commons:$anko_version"
 
     // Room
     implementation "androidx.room:room-runtime:$room_version"

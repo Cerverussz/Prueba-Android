@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.squareup.moshi.Json
+import java.io.Serializable
 
 @Entity(tableName = "infoUser")
 data class InfoUser (
@@ -24,4 +25,4 @@ data class InfoUser (
     @ColumnInfo(name = "phone")
     @field:Json(name = "phone")
     val phone: String = ""
-)
+) : Serializable
