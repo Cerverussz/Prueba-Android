@@ -13,15 +13,17 @@ class UsersListViewModel(private val userRepository: UserRepository) : ViewModel
 
     private val usersListDBMutableLiveData: MutableLiveData<UIState> = MutableLiveData()
     private val usersListAPIMutableLiveData: MutableLiveData<UIState> = MutableLiveData()
+    private val insertUsersListAPIMutableLiveData: MutableLiveData<UIState> = MutableLiveData()
 
     fun getUsersListDBLiveData(): LiveData<UIState> = usersListDBMutableLiveData
     fun getUsersListAPILiveData(): LiveData<UIState> = usersListAPIMutableLiveData
+    fun insertUsersListAPILiveData(): LiveData<UIState> = insertUsersListAPIMutableLiveData
 
     private val subscriptions = CompositeDisposable()
 
     fun getUsersListDB() {
         subscriptions.add(
-                userRepository.getUsers()
+                userRepository.getUsersDB()
                         .doOnSubscribe {
                             usersListDBMutableLiveData.postValue(UIState.Loading)
                         }.subscribeOn(Schedulers.io())
@@ -32,29 +34,29 @@ class UsersListViewModel(private val userRepository: UserRepository) : ViewModel
                                 onError = {
                                     usersListDBMutableLiveData.postValue(UIState.Error(it.message
                                             ?: "Error"))
-                                },
-                                onComplete = {
-                                    // do something
                                 }
                         ))
     }
 
-    fun insertUsersAPI(usersListAPI: List<InfoUser>) {
-        subscriptions.add(userRepository.insertUsers(usersListAPI)
+    fun getUsersListAPI() {
+        subscriptions.add(userRepository.getUsers()
                 .doOnSubscribe {
                     usersListAPIMutableLiveData.postValue(UIState.Loading)
                 }.subscribeOn(Schedulers.io())
                 .subscribeBy(
-                        onComplete = {
-                            usersListAPIMutableLiveData.postValue(UIState.Success(true))
+                        onSuccess = { data ->
+                            usersListAPIMutableLiveData.postValue(UIState.Success(data))
                         },
                         onError = {
                             usersListAPIMutableLiveData.postValue(UIState.Error(it.message
                                     ?: "Error"))
                         }
-                )
-        )
+                ))
+    }
 
+    override fun onCleared() {
+        super.onCleared()
+        subscriptions.dispose()
     }
 
 }

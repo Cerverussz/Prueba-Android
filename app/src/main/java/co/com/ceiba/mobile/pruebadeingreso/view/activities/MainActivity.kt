@@ -39,6 +39,9 @@ class MainActivity : AppCompatActivity() {
 
         setupHandler()
         checkNetwork()
+
+        //TODO: terminar
+        //setupUsersSearch()
     }
 
     private fun setupUI() {
@@ -76,36 +79,42 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         })
-    }
 
-    @SuppressLint("CheckResult")
-    private fun setupAPIService() {
-        val serviceAPI: ApiService = get()
-
-        serviceAPI.getUsersList()
-                .subscribeOn(Schedulers.io())
-                .doOnSubscribe { progressBar.visibility = VISIBLE }
-                .observeOn(AndroidSchedulers.mainThread()).subscribeBy(
-                        onSuccess = { data ->
-                            progressBar.visibility = GONE
-                            usersLisTViewModel.insertUsersAPI(data)
-                            usersLisTViewModel.getUsersListDB()
-                        },
-                        onError = {
-                            Log.i(TAG, it.message ?: "Error")
-                        }
-                )
+        usersLisTViewModel.getUsersListAPILiveData().observe(this, Observer { status ->
+            when (status) {
+                is UIState.Loading -> {
+                    progressBar.visibility = VISIBLE
+                    Log.i(TAG, "Loading...")
+                }
+                is UIState.Success<*> -> {
+                    progressBar.visibility = GONE
+                    val data = status.data as MutableList<InfoUser>
+                    if (data.count() != 0) {
+                        usersListAdapter.setData(data)
+                    } else {
+                        //TODO: add view empty list
+                    }
+                }
+                is UIState.Error -> {
+                    Log.i(TAG, status.message)
+                }
+            }
+        })
     }
 
     private fun setupUsersSearch() {
-        editTextSearch.onChange {
-
+        editTextSearch.onChange { text ->
+            if (text.isNotEmpty()) {
+                usersListAdapter.filter.filter(text)
+            } else {
+                usersListAdapter.setData(usersListAdapter.getData())
+            }
         }
     }
 
     private fun checkNetwork() {
         if (ConnectivityHelper().isConnectedToNetwork(this@MainActivity)) {
-            setupAPIService()
+           usersLisTViewModel.getUsersListAPI()
         } else {
             usersLisTViewModel.getUsersListDB()
         }
