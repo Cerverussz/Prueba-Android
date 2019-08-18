@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -40,8 +41,7 @@ class MainActivity : AppCompatActivity() {
         setupHandler()
         checkNetwork()
 
-        //TODO: terminar
-        //setupUsersSearch()
+        setupUsersSearch()
     }
 
     private fun setupUI() {
@@ -71,10 +71,11 @@ class MainActivity : AppCompatActivity() {
                     if (data.count() != 0) {
                         usersListAdapter.setData(data)
                     } else {
-                        //TODO: add view empty list
+                        empty_view.visibility = VISIBLE
                     }
                 }
                 is UIState.Error -> {
+                    empty_view.visibility = VISIBLE
                     Log.i(TAG, status.message)
                 }
             }
@@ -92,7 +93,7 @@ class MainActivity : AppCompatActivity() {
                     if (data.count() != 0) {
                         usersListAdapter.setData(data)
                     } else {
-                        //TODO: add view empty list
+                        empty_view.visibility = VISIBLE
                     }
                 }
                 is UIState.Error -> {
@@ -104,17 +105,36 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupUsersSearch() {
         editTextSearch.onChange { text ->
-            if (text.isNotEmpty()) {
-                usersListAdapter.filter.filter(text)
+            val filteredModelList = filter(usersListAdapter.getData(), text)
+            if (filteredModelList.isNotEmpty()) {
+                empty_view.visibility = GONE
             } else {
-                usersListAdapter.setData(usersListAdapter.getData())
+                empty_view.visibility = VISIBLE
+            }
+            usersListAdapter.animateTo(filteredModelList)
+            recyclerViewSearchResults.scrollToPosition(0)
+        }
+    }
+
+    private fun filter(models: ArrayList<InfoUser>, query: String): ArrayList<InfoUser> {
+        val arrayQuery = query.toLowerCase().trim()
+        val wordsArray = arrayQuery.split(" ")
+        val filterList = ArrayList<InfoUser>()
+
+        for (model in models) {
+            val patient = model.name.toLowerCase()
+            for (word in wordsArray) {
+                if ((patient.contains(word) && !filterList.contains(model))) {
+                    filterList.add(model)
+                }
             }
         }
+        return filterList
     }
 
     private fun checkNetwork() {
         if (ConnectivityHelper().isConnectedToNetwork(this@MainActivity)) {
-           usersLisTViewModel.getUsersListAPI()
+            usersLisTViewModel.getUsersListAPI()
         } else {
             usersLisTViewModel.getUsersListDB()
         }

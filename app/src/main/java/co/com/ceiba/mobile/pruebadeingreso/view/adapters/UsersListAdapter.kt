@@ -3,28 +3,26 @@ package co.com.ceiba.mobile.pruebadeingreso.view.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Filter
-import android.widget.Filterable
 import androidx.recyclerview.widget.RecyclerView
 import co.com.ceiba.mobile.pruebadeingreso.R
 import co.com.ceiba.mobile.pruebadeingreso.core.onClick
 import co.com.ceiba.mobile.pruebadeingreso.data.db.entities.InfoUser
 import kotlinx.android.synthetic.main.user_list_item.view.*
 
-class UsersListAdapter(private val clickClosure: (InfoUser) -> Unit) : RecyclerView.Adapter<UsersListAdapter.ViewHolder>(), Filterable {
+class UsersListAdapter(private val clickClosure: (InfoUser) -> Unit) :
+    CustomAdapter<InfoUser, UsersListAdapter.ViewHolder>() {
 
-    private var dataItems = mutableListOf<InfoUser>()
-    private var filter = mutableListOf<InfoUser>()
+    private var dataItems = arrayListOf<InfoUser>()
 
     fun setData(usersList: MutableList<InfoUser>) {
-        dataItems.clear()
-        filter.clear()
-        dataItems = usersList
-        filter = usersList
+        this.dataItems = ArrayList(usersList)
+        this.elements = ArrayList(usersList)
         notifyDataSetChanged()
     }
 
-    fun getData(): MutableList<InfoUser> = dataItems
+    fun getData(): ArrayList<InfoUser> {
+      return this.dataItems
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.user_list_item, parent, false)
@@ -32,11 +30,15 @@ class UsersListAdapter(private val clickClosure: (InfoUser) -> Unit) : RecyclerV
     }
 
     override fun getItemCount(): Int {
-        return dataItems.count()
+        return elements.count()
+    }
+
+    override fun getItemId(position: Int): Long {
+        return elements[position].id.toLong()
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val usersList = dataItems[position]
+        val usersList = elements[position]
         holder.bind(usersList)
         holder.bindClick(usersList)
     }
@@ -55,36 +57,33 @@ class UsersListAdapter(private val clickClosure: (InfoUser) -> Unit) : RecyclerV
         }
     }
 
-    override fun getFilter(): Filter {
+  /*  override fun getFilter(): Filter {
         return object : Filter() {
             override fun performFiltering(constraint: CharSequence?): FilterResults {
-                val filterResults = FilterResults()
-
-
-                if (constraint.isNullOrEmpty()) {
-                    filterResults.values = filter
-                    filterResults.count = filter.count()
+                val charSequenceString = constraint.toString()
+                if (charSequenceString.isEmpty()) {
+                    filterItems = dataItems
                 } else {
-                    val prefixString = constraint.toString().toLowerCase()
-                    val results = ArrayList<InfoUser>()
-                    for (user in dataItems) {
-                        if (user.name.toLowerCase().contains(prefixString)) results.add(user)
+                    val filteredList = ArrayList<InfoUser>()
+                    for (name in dataItems) {
+                        if (name.name.toLowerCase().contains(charSequenceString.toLowerCase())) {
+                            filteredList.add(name)
+                        }
+                        filterItems = filteredList
                     }
 
-                    filterResults.values = results
-                    filterResults.count = results.count()
                 }
-
-                return filterResults
+                Log.i("ADAPTER", "--- $filterItems")
+                val results = FilterResults()
+                results.values = filterItems
+                return results
             }
 
             override fun publishResults(constraint: CharSequence, results: FilterResults) {
-                dataItems.clear()
-                dataItems.addAll(results.values as ArrayList<InfoUser>)
-                filter = results.values as ArrayList<InfoUser>
+                filterItems = results.values as ArrayList<InfoUser>
                 notifyDataSetChanged()
 
             }
         }
-    }
+    }*/
 }
