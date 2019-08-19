@@ -78,7 +78,6 @@ dependencies {
         exclude module: 'recyclerview-v7'
     }
 
-    //testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockito_verion"
     testImplementation "org.mockito:mockito-core:$mockito_version"
 
 
