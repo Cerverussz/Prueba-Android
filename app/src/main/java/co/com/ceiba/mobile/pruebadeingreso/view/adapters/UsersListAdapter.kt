@@ -56,34 +56,4 @@ class UsersListAdapter(private val clickClosure: (InfoUser) -> Unit) :
             }
         }
     }
-
-  /*  override fun getFilter(): Filter {
-        return object : Filter() {
-            override fun performFiltering(constraint: CharSequence?): FilterResults {
-                val charSequenceString = constraint.toString()
-                if (charSequenceString.isEmpty()) {
-                    filterItems = dataItems
-                } else {
-                    val filteredList = ArrayList<InfoUser>()
-                    for (name in dataItems) {
-                        if (name.name.toLowerCase().contains(charSequenceString.toLowerCase())) {
-                            filteredList.add(name)
-                        }
-                        filterItems = filteredList
-                    }
-
-                }
-                Log.i("ADAPTER", "--- $filterItems")
-                val results = FilterResults()
-                results.values = filterItems
-                return results
-            }
-
-            override fun publishResults(constraint: CharSequence, results: FilterResults) {
-                filterItems = results.values as ArrayList<InfoUser>
-                notifyDataSetChanged()
-
-            }
-        }
-    }*/
 }

@@ -1,13 +1,11 @@
 package co.com.ceiba.mobile.pruebadeingreso.view.activities
 
-import android.annotation.SuppressLint
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View.GONE
 import android.view.View.VISIBLE
-import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -15,16 +13,10 @@ import co.com.ceiba.mobile.pruebadeingreso.R
 import co.com.ceiba.mobile.pruebadeingreso.core.ConnectivityHelper
 import co.com.ceiba.mobile.pruebadeingreso.core.onChange
 import co.com.ceiba.mobile.pruebadeingreso.data.db.entities.InfoUser
-import co.com.ceiba.mobile.pruebadeingreso.data.remote.api.ApiService
 import co.com.ceiba.mobile.pruebadeingreso.view.adapters.UsersListAdapter
 import co.com.ceiba.mobile.pruebadeingreso.viewmodels.UIState
 import co.com.ceiba.mobile.pruebadeingreso.viewmodels.UsersListViewModel
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
-import org.jetbrains.anko.progressDialog
-import org.koin.android.ext.android.get
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity() {
@@ -37,11 +29,11 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setupUI()
+        setupUsersSearch()
 
         setupHandler()
-        checkNetwork()
-
-        setupUsersSearch()
+        usersLisTViewModel.getUsersListDB()
+       // checkNetwork()
     }
 
     private fun setupUI() {
@@ -71,7 +63,8 @@ class MainActivity : AppCompatActivity() {
                     if (data.count() != 0) {
                         usersListAdapter.setData(data)
                     } else {
-                        empty_view.visibility = VISIBLE
+                        usersLisTViewModel.getUsersListAPI()
+                        //usersLisTViewModel.getUserPostsAPI()
                     }
                 }
                 is UIState.Error -> {
@@ -97,6 +90,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 is UIState.Error -> {
+                    empty_view.visibility = VISIBLE
                     Log.i(TAG, status.message)
                 }
             }
@@ -132,13 +126,13 @@ class MainActivity : AppCompatActivity() {
         return filterList
     }
 
-    private fun checkNetwork() {
+   /* private fun checkNetwork() {
         if (ConnectivityHelper().isConnectedToNetwork(this@MainActivity)) {
             usersLisTViewModel.getUsersListAPI()
         } else {
             usersLisTViewModel.getUsersListDB()
         }
-    }
+    }*/
 
     companion object {
         const val TAG = "MainActivity"

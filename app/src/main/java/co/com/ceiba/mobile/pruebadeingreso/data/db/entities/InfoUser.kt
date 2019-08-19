@@ -9,7 +9,7 @@ import java.io.Serializable
 @Entity(tableName = "infoUser")
 data class InfoUser (
 
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey(autoGenerate = false)
     @ColumnInfo(name = "id")
     @field:Json(name = "id")
     val id: Int = 0,

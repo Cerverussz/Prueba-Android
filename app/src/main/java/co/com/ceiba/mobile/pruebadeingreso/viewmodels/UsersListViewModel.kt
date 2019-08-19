@@ -13,45 +13,73 @@ class UsersListViewModel(private val userRepository: UserRepository) : ViewModel
 
     private val usersListDBMutableLiveData: MutableLiveData<UIState> = MutableLiveData()
     private val usersListAPIMutableLiveData: MutableLiveData<UIState> = MutableLiveData()
-    private val insertUsersListAPIMutableLiveData: MutableLiveData<UIState> = MutableLiveData()
+    private val userPostsAPIMutableLiveData: MutableLiveData<UIState> = MutableLiveData()
 
     fun getUsersListDBLiveData(): LiveData<UIState> = usersListDBMutableLiveData
     fun getUsersListAPILiveData(): LiveData<UIState> = usersListAPIMutableLiveData
-    fun insertUsersListAPILiveData(): LiveData<UIState> = insertUsersListAPIMutableLiveData
+    fun getUserPostsAPILiveData(): LiveData<UIState> = userPostsAPIMutableLiveData
 
     private val subscriptions = CompositeDisposable()
 
     fun getUsersListDB() {
         subscriptions.add(
-                userRepository.getUsersDB()
-                        .doOnSubscribe {
-                            usersListDBMutableLiveData.postValue(UIState.Loading)
-                        }.subscribeOn(Schedulers.io())
-                        .subscribeBy(
-                                onNext = {
-                                    usersListDBMutableLiveData.postValue(UIState.Success(it))
-                                },
-                                onError = {
-                                    usersListDBMutableLiveData.postValue(UIState.Error(it.message
-                                            ?: "Error"))
-                                }
-                        ))
+            userRepository.getUsersDB()
+                .doOnSubscribe {
+                    usersListDBMutableLiveData.postValue(UIState.Loading)
+                }.subscribeOn(Schedulers.io())
+                .subscribeBy(
+                    onNext = {
+                        usersListDBMutableLiveData.postValue(UIState.Success(it))
+                    },
+                    onError = {
+                        usersListDBMutableLiveData.postValue(
+                            UIState.Error(
+                                it.message
+                                    ?: "Error"
+                            )
+                        )
+                    }
+                ))
     }
 
     fun getUsersListAPI() {
         subscriptions.add(userRepository.getUsers()
-                .doOnSubscribe {
-                    usersListAPIMutableLiveData.postValue(UIState.Loading)
-                }.subscribeOn(Schedulers.io())
-                .subscribeBy(
-                        onSuccess = { data ->
-                            usersListAPIMutableLiveData.postValue(UIState.Success(data))
-                        },
-                        onError = {
-                            usersListAPIMutableLiveData.postValue(UIState.Error(it.message
-                                    ?: "Error"))
-                        }
-                ))
+            .doOnSubscribe {
+                usersListAPIMutableLiveData.postValue(UIState.Loading)
+            }.subscribeOn(Schedulers.io())
+            .subscribeBy(
+                onSuccess = { data ->
+                    usersListAPIMutableLiveData.postValue(UIState.Success(data))
+                },
+                onError = {
+                    usersListAPIMutableLiveData.postValue(
+                        UIState.Error(
+                            it.message
+                                ?: "Error"
+                        )
+                    )
+                }
+            ))
+    }
+
+    fun getUserPostsAPI() {
+        subscriptions.add(userRepository.getUserPosts()
+            .doOnSubscribe {
+                userPostsAPIMutableLiveData.postValue(UIState.Loading)
+            }.subscribeOn(Schedulers.io())
+            .subscribeBy(
+                onNext = {
+                    userPostsAPIMutableLiveData.postValue(UIState.Success(it))
+                },
+                onError = {
+                    userPostsAPIMutableLiveData.postValue(
+                        UIState.Error(
+                            it.message
+                                ?: "Error"
+                        )
+                    )
+                }
+            ))
     }
 
     override fun onCleared() {

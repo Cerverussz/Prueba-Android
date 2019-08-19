@@ -5,7 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import co.com.ceiba.mobile.pruebadeingreso.R
-import co.com.ceiba.mobile.pruebadeingreso.entities.UserPosts
+import co.com.ceiba.mobile.pruebadeingreso.data.db.entities.UserPosts
 import kotlinx.android.synthetic.main.post_list_item.view.*
 
 class UserPostsAdapter : RecyclerView.Adapter<UserPostsAdapter.ViewHolder>() {
