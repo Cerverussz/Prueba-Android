@@ -1,15 +1,15 @@
 package co.com.ceiba.mobile.pruebadeingreso.models.repository
 
+import androidx.room.Query
 import co.com.ceiba.mobile.pruebadeingreso.data.db.entities.InfoUser
+import io.reactivex.Completable
 import io.reactivex.Flowable
-import io.reactivex.Single
 
 interface UserRepository {
 
-    fun insertUsers(users: List<InfoUser>)
+    fun insertUsers(users: List<InfoUser>): Completable
 
-    fun getUsers(): Single<List<InfoUser>>
-
-    fun getUsersDB(): Flowable<List<InfoUser>>
+    @Query("SELECT * FROM infoUser")
+    fun getUsers(): Flowable<List<InfoUser>>
 
 }
