@@ -3,7 +3,6 @@ package co.com.ceiba.mobile.pruebadeingreso.viewmodels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import co.com.ceiba.mobile.pruebadeingreso.data.db.entities.InfoUser
 import co.com.ceiba.mobile.pruebadeingreso.models.repository.UserRepository
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.subscribeBy
@@ -13,11 +12,9 @@ class UsersListViewModel(private val userRepository: UserRepository) : ViewModel
 
     private val usersListDBMutableLiveData: MutableLiveData<UIState> = MutableLiveData()
     private val usersListAPIMutableLiveData: MutableLiveData<UIState> = MutableLiveData()
-    private val userPostsAPIMutableLiveData: MutableLiveData<UIState> = MutableLiveData()
 
     fun getUsersListDBLiveData(): LiveData<UIState> = usersListDBMutableLiveData
     fun getUsersListAPILiveData(): LiveData<UIState> = usersListAPIMutableLiveData
-    fun getUserPostsAPILiveData(): LiveData<UIState> = userPostsAPIMutableLiveData
 
     private val subscriptions = CompositeDisposable()
 
@@ -53,26 +50,6 @@ class UsersListViewModel(private val userRepository: UserRepository) : ViewModel
                 },
                 onError = {
                     usersListAPIMutableLiveData.postValue(
-                        UIState.Error(
-                            it.message
-                                ?: "Error"
-                        )
-                    )
-                }
-            ))
-    }
-
-    fun getUserPostsAPI() {
-        subscriptions.add(userRepository.getUserPosts()
-            .doOnSubscribe {
-                userPostsAPIMutableLiveData.postValue(UIState.Loading)
-            }.subscribeOn(Schedulers.io())
-            .subscribeBy(
-                onNext = {
-                    userPostsAPIMutableLiveData.postValue(UIState.Success(it))
-                },
-                onError = {
-                    userPostsAPIMutableLiveData.postValue(
                         UIState.Error(
                             it.message
                                 ?: "Error"

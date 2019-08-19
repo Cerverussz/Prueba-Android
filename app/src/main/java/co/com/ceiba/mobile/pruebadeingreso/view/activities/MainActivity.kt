@@ -10,7 +10,6 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import co.com.ceiba.mobile.pruebadeingreso.R
-import co.com.ceiba.mobile.pruebadeingreso.core.ConnectivityHelper
 import co.com.ceiba.mobile.pruebadeingreso.core.onChange
 import co.com.ceiba.mobile.pruebadeingreso.data.db.entities.InfoUser
 import co.com.ceiba.mobile.pruebadeingreso.view.adapters.UsersListAdapter
@@ -33,7 +32,6 @@ class MainActivity : AppCompatActivity() {
 
         setupHandler()
         usersLisTViewModel.getUsersListDB()
-       // checkNetwork()
     }
 
     private fun setupUI() {
@@ -64,7 +62,6 @@ class MainActivity : AppCompatActivity() {
                         usersListAdapter.setData(data)
                     } else {
                         usersLisTViewModel.getUsersListAPI()
-                        //usersLisTViewModel.getUserPostsAPI()
                     }
                 }
                 is UIState.Error -> {
@@ -125,14 +122,6 @@ class MainActivity : AppCompatActivity() {
         }
         return filterList
     }
-
-   /* private fun checkNetwork() {
-        if (ConnectivityHelper().isConnectedToNetwork(this@MainActivity)) {
-            usersLisTViewModel.getUsersListAPI()
-        } else {
-            usersLisTViewModel.getUsersListDB()
-        }
-    }*/
 
     companion object {
         const val TAG = "MainActivity"
