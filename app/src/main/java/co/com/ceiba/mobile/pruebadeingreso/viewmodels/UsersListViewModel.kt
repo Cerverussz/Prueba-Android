@@ -61,7 +61,7 @@ class UsersListViewModel(private val userRepository: UserRepository) : ViewModel
 
     override fun onCleared() {
         super.onCleared()
-        subscriptions.dispose()
+        subscriptions.clear()
     }
 
 }
